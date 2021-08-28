@@ -6,13 +6,17 @@ using System.Threading.Tasks;
 
 namespace McErlean_HelloWorld
 {
-
-    class Program
+    // Class: Program
+    // Author: Daniel McErlean
+    // Purpose: Output text and a variable to the console.
+    // Restrictions: None
+    static class Program
     {
 
         // Method: Main
         // Purpose: Write personal name to the console
         //          Multiply 2 numbers and output to console
+        // Restrictions: None
         static void Main(string[] args)
         {
             // Writes name to console
