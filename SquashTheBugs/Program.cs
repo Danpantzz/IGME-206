@@ -40,7 +40,7 @@ namespace SquashTheBugs
 
                 // output the calculation based on the numbers
                 //Console.WriteLine(i / (i - 1));
-                //Logic error: first run of the for loop will result in a divide by 0 error.
+                //Run-time error: first run of the for loop will result in a divide by 0 error, crashing program.
                 if (i == 1)
                 {
                     Console.WriteLine(i);
