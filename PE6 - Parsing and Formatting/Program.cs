@@ -34,7 +34,7 @@ namespace PE6___Parsing_and_Formatting
 
                 //Used for testing the programs ability in guessing numbers too high, low, or correct
                 //Commment out line when testing is complete
-                //Console.WriteLine(randomNumber);
+                Console.WriteLine(randomNumber);
 
                 //Allow the user to guess 8 times
                 for (i = 0; i < 8; i++)
@@ -61,7 +61,17 @@ namespace PE6___Parsing_and_Formatting
                     {
                         Console.Write("I told you between 0 and 100! Try again: ");
                         sGuess = Console.ReadLine();
-                        guess = Convert.ToInt32(sGuess);
+                        try
+                        {
+                            guess = Convert.ToInt32(sGuess);
+                        }
+                        catch (Exception error)
+                        {
+                            Console.WriteLine("Try again, numbers only this time.");
+
+                            //substracts i to not count the guess, then loops back to beginnning of for loop
+                            continue;
+                        }
                     }
 
                     //Tells the user their guess is too low
