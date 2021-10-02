@@ -19,12 +19,12 @@ namespace PE12___Number_3
         {
             MyDervivedClass n = new MyDervivedClass();
 
-            
+
 
             Console.Write(n.GetString());
         }
     }
-    
+
     public class MyDervivedClass : myClass
     {
 
@@ -33,5 +33,5 @@ namespace PE12___Number_3
             return base.GetString() + " (output from the derived class)\n";
         }
     }
-    
+
 }
