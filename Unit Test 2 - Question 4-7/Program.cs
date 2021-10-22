@@ -58,7 +58,17 @@ namespace Unit_Test_2___Question_4_7
         private string phoneNumber;
         public string address;
 
-        public string PhoneNumber;
+        public string PhoneNumber
+        {
+            get
+            {
+                return this.phoneNumber;
+            }
+            set
+            {
+                this.phoneNumber = value;
+            }
+        }
 
         public abstract void Connect();
         public abstract void Disconnect();
