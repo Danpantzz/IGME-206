@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 
 using Newtonsoft.Json;
 using System.IO;
@@ -34,7 +35,17 @@ namespace PE21_22
     static class Program
     {
         static int health;
-        static int roomState;
+        static int roomState = 0;
+        static bool bTimeOut = false;
+        static Timer timeOutTimer;
+
+        //Strings for traps that will go off
+        static string[] trap = new string[] 
+        { (""), ("\nYou tripped on a rock."), ("\nA bat smacked you in face."), ("\nYou found a pebble in your shoe."),
+                ("\nYou turned your neck the wrong way. It hurt."), ("\nYou remembered something weird you did in highschool."),
+                ("\nA snake told you that your shirt is ugly."), ("\nSomething in the darkness bit you."), ("\nA huge boulder nearly hit you."),
+                ("\nYou simply felt yourself lose health. Somewhere you can hear a voice laughing.")
+        };
 
         //Creates a matrix that represents the maze
         static (string, int)[,] mazeMatrix = new (string, int)[,]
@@ -88,14 +99,14 @@ namespace PE21_22
 
         static void Main(string[] args)
         {
-            health = 1;
-            roomState = 0;
             string userState;
             bool playAgain = true;
 
             while (playAgain)
             {
+                roomState = 0;
                 bool alive = true;
+                health = 1;
 
                 Console.WriteLine("You find yourself in a strange room. {0} A booming voice speaks out to you:\n\n'Welcome to my Dungeon. Here you will wager your " +
                     "life and answer questions.\nWith every question you get right, your life will increase by your wager.\nHowever, with every question you get wrong, " +
@@ -110,10 +121,20 @@ namespace PE21_22
                     if (userState.ToLower() == "wager")
                     {
                         AskTrivia();
+
+                        if (health <= 0)
+                        {
+                            alive = false;
+                            continue;
+                        }
+
+                        Console.WriteLine(RoomDesc());
                     }
                     else
                     {
-                        if (SState2NState(userState) == -1)
+                        int newState = SState2NState(userState);
+
+                        if (newState == -1)
                         {
                             Console.WriteLine("\nInvalid command.\n");
                             Console.WriteLine(RoomDesc());
@@ -121,7 +142,13 @@ namespace PE21_22
                         }
                         else
                         {
-                            roomState = SState2NState(userState);
+                            roomState = newState;
+
+                            if (roomState != 0 && roomState != 7)
+                            {
+                                Trap();
+                            }
+
                             Console.WriteLine(RoomDesc());
                         }
                     }
@@ -130,7 +157,7 @@ namespace PE21_22
 
                 if (!alive)
                 {
-                    Console.WriteLine("Too bad.");
+                    Console.WriteLine("You ran out of health. Too bad.");
                 }
 
                 Console.WriteLine("Would you like to play again?");
@@ -147,7 +174,7 @@ namespace PE21_22
 
             }
 
-            Console.WriteLine("Try again another time.");
+            Console.WriteLine("Come again soon.");
 
         }
 
@@ -157,38 +184,46 @@ namespace PE21_22
 
             if (sState.ToLower() == "n" || sState.ToLower().Contains("north") || sState.ToLower().Contains("up"))
             {
-                for (int i = 0; i < listGraph[roomState].Length; i++)
+                for (int i = 0; i < listGraph[roomState].Length; ++i)
                 {
-                    if (listGraph[roomState][i].Item2 != "N") { continue; }
-                    if (listGraph[roomState][i].Item3 > health) { continue; }
-                    nState = listGraph[roomState][i].Item1;
+                    if (listGraph[roomState][i].Item2 == "N" && listGraph[roomState][i].Item3 < health)
+                    {
+                        nState = listGraph[roomState][i].Item1;
+                        health = health - listGraph[roomState][i].Item3;
+                    }
                 }
             }
-            if (sState.ToLower() == "s" || sState.ToLower().Contains("south") || sState.ToLower().Contains("down"))
+            else if (sState.ToLower() == "s" || sState.ToLower().Contains("south") || sState.ToLower().Contains("down"))
             {
-                for (int i = 0; i < listGraph[roomState].Length; i++)
+                for (int i = 0; i < listGraph[roomState].Length; ++i)
                 {
-                    if (listGraph[roomState][i].Item2 != "S") { continue; }
-                    if (listGraph[roomState][i].Item3 > health) { continue; }
-                    nState = listGraph[roomState][i].Item1;
+                    if (listGraph[roomState][i].Item2 == "S" && listGraph[roomState][i].Item3 < health)
+                    {
+                        nState = listGraph[roomState][i].Item1;
+                        health = health - listGraph[roomState][i].Item3;
+                    }
                 }
             }
-            if (sState.ToLower() == "e" || sState.ToLower().Contains("east") || sState.ToLower().Contains("right"))
+            else if (sState.ToLower() == "e" || sState.ToLower().Contains("east") || sState.ToLower().Contains("right"))
             {
-                for (int i = 0; i < listGraph[roomState].Length; i++)
+                for (int i = 0; i < listGraph[roomState].Length; ++i)
                 {
-                    if (listGraph[roomState][i].Item2 != "E") { continue; }
-                    if (listGraph[roomState][i].Item3 > health) { continue; }
-                    nState = listGraph[roomState][i].Item1;
+                    if (listGraph[roomState][i].Item2 == "E" && listGraph[roomState][i].Item3 < health)
+                    {
+                        nState = listGraph[roomState][i].Item1;
+                        health = health - listGraph[roomState][i].Item3;
+                    }
                 }
             }
-            if (sState.ToLower() == "w" || sState.ToLower().Contains("west") || sState.ToLower().Contains("left"))
+            else if (sState.ToLower() == "w" || sState.ToLower().Contains("west") || sState.ToLower().Contains("left"))
             {
-                for (int i = 0; i < listGraph[roomState].Length; i++)
+                for (int i = 0; i < listGraph[roomState].Length; ++i)
                 {
-                    if (listGraph[roomState][i].Item2 != "W") { continue; }
-                    if (listGraph[roomState][i].Item3 > health) { continue; }
-                    nState = listGraph[roomState][i].Item1;
+                    if (listGraph[roomState][i].Item2 == "W" && listGraph[roomState][i].Item3 < health)
+                    {
+                        nState = listGraph[roomState][i].Item1;
+                        health = health - listGraph[roomState][i].Item3;
+                    }
                 }
             }
 
@@ -212,51 +247,130 @@ namespace PE21_22
             }
             if (roomState == 1)
             {
-                return ("1");
+                s += ("This room is slightly less decayed, although the smell is still there. In the corner you see bones.");
+
+                if (health > 2)
+                {
+                    s += " You see a door south of you.";
+                }
+                if (health > 3)
+                {
+                    s += " You see a door east of you.";
+                }
+
+                return s;
             }
             if (roomState == 2)
             {
-                return ("2");
+                s += ("A golden light seems to flicker in and out of this room, but you can't exactly tell where it comes from.");
+
+                if (health > 2)
+                {
+                    s += " You see the room to the north.";
+                }
+                if (health > 20)
+                {
+                    s += " You see a strange looking door south of you.";
+                }
+
+                return s;
             }
             if (roomState == 3)
             {
-                return ("3");
+                s += ("It seems this room only gets worse. The walls are covered in what appears to be blood, though it might just be jam.\nWho really knows at this point.");
+
+                if (health > 2)
+                {
+                    s += " You notice a door to the north.";
+                }
+                if (health > 3)
+                {
+                    s += " You notice the door to the west which you came from.";
+                }
+                if (health > 4)
+                {
+                    s += " You notice a door to the east.";
+                }
+                if (health > 5)
+                {
+                    s += " You notice a door to the south.";
+                }
+
+                return s;
             }
             if (roomState == 4)
             {
-                return ("4");
+                s += ("This room seems to be filled with total darkness. You can't see your own hand in front of your face.");
+
+                if (health > 3)
+                {
+                    s += " Somehow, a doorframe shimmers to the south, but casts no light on the ground.";
+                }
+
+                return s;
             }
             if (roomState == 5)
             {
-                return ("5");
+                s += "A golden lights fills this room, but you think it might actually be your imagination.";
+
+                if (health > 1)
+                {
+                    s += " You see a hallway to the east.";
+                }
+
+                return s;
             }
             if (roomState == 6)
             {
-                return ("6");
+                s += "This hallway seems to stretch on infinitely, however at the same time, you know that there is an end if you continue north.";
+
+                if (health > 2)
+                {
+                    s += "You look around and actually realize the hallway is not infinite, and there is another end to the south.";
+                }
+
+                return s;
             }
             if (roomState == 7)
             {
-                return ("7");
+                s += "'Congratulations!' Yells the booming voice. 'You have made it to the final room, and are just in time for the surprise party!'\n" +
+                    "You realize you just managed to walk into your house where all your friends were waiting to surprise you on your birthday.\nYou look behind you " +
+                    "to see if there is any remain that creepy dungeon, but there is only the darkness of the night sky.";
+
+                return s;
             }
             else
             {
-                return ("Error: Something terrible happened :(");
+                return ("Error: Something terrible happened :(\nRoom: " + roomState);
             }
         }
 
+        static void Trap()
+        {
+            Random rand = new Random();
+
+            int damage = rand.Next(0, health);
+            int chooser = rand.Next(0, 10);
+
+            Console.WriteLine(trap[chooser]);
+            Console.WriteLine("You lost {0} health.\n", damage);
+            health -= damage;
+        }
+
+
         static void Status()
         {
-            Console.WriteLine("Health: {0}\nAvailable Commands: Wager, or choose an Exit\n", health);
+            Console.WriteLine("Health: {0}\nAvailable Commands: Wager, or choose a Path\n", health);
         }
 
         static void AskTrivia()
         {
             string url = null;
             string s = null;
-            bool success = false;
-            int wager = 500;
+            int wager;
             string answer;
             string[] answers = new string[4];
+            string[] letters = new string[] { ("a"), ("b"), ("c"), ("d") };
             Random rand = new Random();
             int r = rand.Next(0, 4);
 
@@ -291,23 +405,40 @@ namespace PE21_22
                 goto tryagain;
             }
 
-            Console.WriteLine("Here comes the question:");
+            Console.WriteLine("Here comes the question. You will have 15 seconds to answer:");
             Console.WriteLine(trivia.results[0].question);
 
             answers[r] = trivia.results[0].correct_answer;
+            int wrong = 0;
 
             for (int i = 0; i < 4; ++i)
             {
                 if (i == r) { continue; }
-                answers[i] = trivia.results[0].incorrect_answers[i];
+                answers[i] = trivia.results[0].incorrect_answers[wrong];
+                ++wrong;
             }
 
-            for (int i = 0; i < answers.Length; ++i) { Console.WriteLine(answers[i]); }
+            for (int i = 0; i < answers.Length; ++i) { Console.WriteLine(letters[i] + ": " + answers[i]); }
+
+            timeOutTimer = new Timer(15000);
+
+            ElapsedEventHandler elapsedEventHandler;
+
+            elapsedEventHandler = new ElapsedEventHandler(TimesUp);
+
+            timeOutTimer.Elapsed += elapsedEventHandler;
+
+            timeOutTimer.Start();
 
             Console.Write("Your answer: ");
             answer = Console.ReadLine();
 
-            if (answer == trivia.results[0].correct_answer)
+            //test by setting answer equal to answer.
+            //answer = trivia.results[0].correct_answer;
+
+            timeOutTimer.Stop();
+
+            if ((answer.ToLower() == trivia.results[0].correct_answer.ToLower() || answer.ToLower() == letters[r]) && !bTimeOut)
             {
                 Console.WriteLine("You did it!");
                 Console.WriteLine("{0} health points added.", wager);
@@ -315,11 +446,29 @@ namespace PE21_22
             }
             else
             {
-                Console.WriteLine("Sorry, but that was incorrect.");
+                if (bTimeOut)
+                {
+                    Console.WriteLine("You took too long. The answer was {0}", trivia.results[0].correct_answer);
+                }
+                else
+                {
+                    Console.WriteLine("Sorry, but that was incorrect. The answer was {0}", trivia.results[0].correct_answer);
+                }
                 Console.WriteLine("{0} health points lost.", wager);
                 health -= wager;
             }
 
+        }
+
+        //Method: TimesUp
+        //Purpose: Display a message if the user timed out
+        //Restrictions: None
+        static void TimesUp(object source, ElapsedEventArgs e)
+        {
+            timeOutTimer.Stop();
+            Console.WriteLine();
+            Console.WriteLine("Times up.");
+            bTimeOut = true;
         }
     }
 }
