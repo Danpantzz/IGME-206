@@ -9,7 +9,7 @@ using System.IO;
 using System.Net;
 using System.Web;
 
-namespace PE22
+namespace PE21_22
 {
 
     class Trivia
@@ -91,40 +91,63 @@ namespace PE22
             health = 1;
             roomState = 0;
             string userState;
+            bool playAgain = true;
 
-            Console.WriteLine("You find yourself in a strange room. {0} A booming voice speaks out to you:\n\n'Welcome to my Dungeon. Here you will wager your " +
-                "life and answer questions.\nWith every question you get right, your life will increase by your wager.\nHowever, with every question you get wrong, " +
-                "your life will be lost by that same amount.\nAs you gain more health, more doors will open to you.\nWill you play my game?'", RoomDesc());
-
-            while (roomState != 7)
+            while (playAgain)
             {
-                Console.WriteLine("\nWhat would you like to do?");
-                Status();
-                userState = Console.ReadLine();
+                bool alive = true;
 
-                if (userState.ToLower() == "wager")
+                Console.WriteLine("You find yourself in a strange room. {0} A booming voice speaks out to you:\n\n'Welcome to my Dungeon. Here you will wager your " +
+                    "life and answer questions.\nWith every question you get right, your life will increase by your wager.\nHowever, with every question you get wrong, " +
+                    "your life will be lost by that same amount.\nAs you gain more health, more doors will open to you.\nWill you play my game?'", RoomDesc());
+
+                while (roomState != 7 && alive)
                 {
-                    AskTrivia();
-                }
-                else
-                {
-                    if (SState2NState(userState) == -1)
+                    Console.WriteLine("\nWhat would you like to do?");
+                    Status();
+                    userState = Console.ReadLine();
+
+                    if (userState.ToLower() == "wager")
                     {
-                        Console.WriteLine("\nInvalid command.\n");
-                        Console.WriteLine(RoomDesc());
-                        continue;
+                        AskTrivia();
                     }
                     else
                     {
-                        roomState = SState2NState(userState);
-                        Console.WriteLine(RoomDesc());
+                        if (SState2NState(userState) == -1)
+                        {
+                            Console.WriteLine("\nInvalid command.\n");
+                            Console.WriteLine(RoomDesc());
+                            continue;
+                        }
+                        else
+                        {
+                            roomState = SState2NState(userState);
+                            Console.WriteLine(RoomDesc());
+                        }
                     }
+
+                }
+
+                if (!alive)
+                {
+                    Console.WriteLine("Too bad.");
+                }
+
+                Console.WriteLine("Would you like to play again?");
+                string again = Console.ReadLine();
+
+                if (again.ToLower().Contains("y"))
+                {
+                    playAgain = true;
+                }
+                else
+                {
+                    playAgain = false;
                 }
 
             }
 
-
-            Console.WriteLine("Would you like to play again?");
+            Console.WriteLine("Try again another time.");
 
         }
 
@@ -230,6 +253,12 @@ namespace PE22
         {
             string url = null;
             string s = null;
+            bool success = false;
+            int wager = 500;
+            string answer;
+            string[] answers = new string[4];
+            Random rand = new Random();
+            int r = rand.Next(0, 4);
 
             HttpWebRequest request;
             HttpWebResponse response;
@@ -251,6 +280,46 @@ namespace PE22
             {
                 trivia.results[0].incorrect_answers[i] = HttpUtility.HtmlDecode(trivia.results[0].incorrect_answers[i]);
             }
+
+        tryagain:
+
+            Console.Write("\nEnter an amount of health to wager (you cannot wager more than you have): ");
+            wager = Convert.ToInt32(Console.ReadLine());
+            if (wager > health)
+            {
+                Console.WriteLine("That was more than your health. Try again.");
+                goto tryagain;
+            }
+
+            Console.WriteLine("Here comes the question:");
+            Console.WriteLine(trivia.results[0].question);
+
+            answers[r] = trivia.results[0].correct_answer;
+
+            for (int i = 0; i < 4; ++i)
+            {
+                if (i == r) { continue; }
+                answers[i] = trivia.results[0].incorrect_answers[i];
+            }
+
+            for (int i = 0; i < answers.Length; ++i) { Console.WriteLine(answers[i]); }
+
+            Console.Write("Your answer: ");
+            answer = Console.ReadLine();
+
+            if (answer == trivia.results[0].correct_answer)
+            {
+                Console.WriteLine("You did it!");
+                Console.WriteLine("{0} health points added.", wager);
+                health += wager;
+            }
+            else
+            {
+                Console.WriteLine("Sorry, but that was incorrect.");
+                Console.WriteLine("{0} health points lost.", wager);
+                health -= wager;
+            }
+
         }
     }
 }
