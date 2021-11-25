@@ -44,6 +44,8 @@ namespace BTree
             Application.Exit();
         }
 
+
+        //Revised for Unit Test 3
         private void Button1_Click(object sender, EventArgs e)
         {
             // load a tree with random numbers
@@ -53,6 +55,7 @@ namespace BTree
 
             this.richTextBox1.Clear();
 
+            /*
             for (int i = 0; i < 10; ++i)
             {
                 node = new BTree(random.Next(100), root);
@@ -62,10 +65,33 @@ namespace BTree
                     root = node;
                 }
             }
+            */
+
+            node = new BTree(1, root);
+            root = node;
+            node = new BTree(5, root);
+            node = new BTree(15, root);
+            node = new BTree(20, root);
+            node = new BTree(21, root);
+            node = new BTree(22, root);
+            node = new BTree(23, root);
+            node = new BTree(24, root);
+            node = new BTree(25, root);
+            node = new BTree(30, root);
+            node = new BTree(35, root);
+            node = new BTree(37, root);
+            node = new BTree(40, root);
+            node = new BTree(55, root);
+            node = new BTree(60, root);
+
 
             this.richTextBox1.Text += "\n";
 
             BTree.TraverseAscending(root);
+
+            List<int> list = new List<int>();
+
+            list.Add();
 
             VisualizeBinaryTree visualizeBinaryTree = new VisualizeBinaryTree(root);
         }
