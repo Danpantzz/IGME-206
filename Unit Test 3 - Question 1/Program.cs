@@ -77,31 +77,31 @@ namespace Unit_Test_3___Question_1
                 Console.WriteLine(alphabet[i][0].Item1 + ": " + alphabet[i][0].Item2);
             }
 
-            string reverse = "";
+            //string reverse = "";
 
-            for (int i = 0; i < userString.Length; i++)
-            {
-                reverse += userString[(userString.Length - 1) - i];
-            }
-
-            Console.WriteLine("Reversed: " + reverse);
-
-            reverse = reverse.ToLower();
-            userString = userString.ToLower();
-
-            reverse = reverse.Replace(",", "");
-            userString = userString.Replace(",", "");
-
-            reverse = reverse.Replace("'", "");
-            userString = userString.Replace("'", "");
-
-            reverse = reverse.Replace(" ", "");
-            userString = userString.Replace(" ", "");
-
-            if (reverse == userString)
-            {
-                Console.WriteLine("You entered a palindrome!");
-            }
+            //for (int i = 0; i < userString.Length; i++)
+            //{
+            //    reverse += userString[(userString.Length - 1) - i];
+            //}
+            //
+            //Console.WriteLine("Reversed: " + reverse);
+            //
+            //reverse = reverse.ToLower();
+            //userString = userString.ToLower();
+            //
+            //reverse = reverse.Replace(",", "");
+            //userString = userString.Replace(",", "");
+            //
+            //reverse = reverse.Replace("'", "");
+            //userString = userString.Replace("'", "");
+            //
+            //reverse = reverse.Replace(" ", "");
+            //userString = userString.Replace(" ", "");
+            //
+            //if (reverse == userString)
+            //{
+            //    Console.WriteLine("You entered a palindrome!");
+            //}
 
         }
     }
