@@ -6,9 +6,15 @@ using System.Threading.Tasks;
 
 namespace Final_Exam___Question_1
 {
+    //Class: Program
+    //Author: Daniel McErlean
+    //Purpose: Count how many letters appear in an entered string
+    //Restrictions: None
     class Program
     {
-
+        //Method: Main
+        //Purpose: Count how many letters appear in an entered string
+        //Restrictions: None
         static void Main(string[] args)
         {
             string sSentence = null;
